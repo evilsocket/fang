@@ -103,7 +103,7 @@ try:
 	
 	(o,args) = parser.parse_args()
     
-	conf     = open( "/usr/share/fang/fang.conf", "rt" ) 
+	conf     = open( "fang.conf", "rt" ) 
 	services = []
 
 	for line in conf:
