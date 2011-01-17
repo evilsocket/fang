@@ -41,7 +41,7 @@ class Service(threading.Thread):
 		
 		cleartext = self.__crack(self.hash)
 		if cleartext != None:
-			print "@ Found '%s' on %s !" % (cleartext,self.name)
+			print "\t%s : %s" % (cleartext,self.name)
 			if self.exit_on_match == True:
 				os.kill( os.getpid(), signal.SIGTERM )
 			
@@ -92,18 +92,18 @@ try:
                
 	parser = OptionParser( usage = "usage: %prog [options] [--hash <hash>]\n\n" +
                                    "EXAMPLES:\n" +
-                                   "\t%prog --hash 7815696ecbf1c96e6894b779456d330e\n" +
-                                   "\t%prog --threads 10 --exit-on-first-match --hash 7815696ecbf1c96e6894b779456d330e\n" +
-                                   "\t%prog --list\n" )
+                                   "  %prog --hash 7815696ecbf1c96e6894b779456d330e\n" +
+                                   "  %prog --threads 10 --exit-first --hash 7815696ecbf1c96e6894b779456d330e\n" +
+                                   "  %prog --list" )
 
 	parser.add_option( "-H", "--hash",		 action="store", 	  dest="hash",		    default=None,  help="The hash to crack, mandatory." );
 	parser.add_option( "-t", "--threads", 	 action="store", 	  dest="threads",       default=10,    help="Specify how many threads to use, default 10." )
-	parser.add_option( "-e", "--exit_first", action="store_true", dest="exit_on_first", default=False, help="Stop execution upon first positive match." )
+	parser.add_option( "-e", "--exit-first", action="store_true", dest="exit_on_first", default=False, help="Stop execution upon first positive match." )
 	parser.add_option( "-l", "--list",		 action="store_true", dest="list_services", default=False, help="Print a list of available services." );
 	
 	(o,args) = parser.parse_args()
     
-	conf     = open( "fang.conf", "rt" ) 
+	conf     = open( "/usr/share/fang/fang.conf", "rt" ) 
 	services = []
 
 	for line in conf:
@@ -114,12 +114,12 @@ try:
 	
 	if o.list_services == True:
 		for si, service in enumerate(services):	
-			print "[%d] %s" % (si,service.name)
+			print "\t[%d] %s" % (si,service.name)
 		exit(0)
 	elif o.hash == None:
 		parser.error( "No hash specified!" )
 
-	print "@ Serching for '%s' upon %d services ..." % (o.hash,len(services))
+	print "Searching for '%s' upon %d services... \n" % (o.hash,len(services))
 
 	i = 0
 	for si, service in enumerate(services):	
@@ -133,4 +133,3 @@ except IOError as e:
 	print e
 except:
 	raise
-
