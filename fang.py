@@ -86,8 +86,8 @@ class Service(threading.Thread):
 		return args
 
 try:
-	print "\n\tFang 1.0 - A multi service threaded MD5 cracker.\n \
-\tCopyleft Simone Margaritelli <evilsocket@backbox.org>\n \
+	print "\n\tFang 1.1 - A multi service threaded MD5 cracker.\n \
+\tCopyleft Simone Margaritelli <evilsocket@gmail.com>\n \
 \thttp://www.evilsocket.net\n\thttp://www.backbox.org\n";
                
 	parser = OptionParser( usage = "usage: %prog [options] [--hash <hash>]\n\n" +
