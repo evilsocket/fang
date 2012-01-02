@@ -25,12 +25,12 @@ class Service(threading.Thread):
 	def __init__ ( self, type, url, regex, exit_on_match, hash ):
 		threading.Thread.__init__(self)
 		
-		self.type  		   = type
-		self.url   		   = url
-		self.hash		   = hash if hash != None else ""
-		self.regex 		   = regex.replace( '{HASH}', self.hash )
-		self.args  		   = {}
-		self.name  		   = urlparse.urlparse(url)[1]
+		self.type  		     = type
+		self.url   		     = url
+		self.hash		       = hash if hash != None else ""
+		self.regex 		     = regex.replace( '{HASH}', self.hash )
+		self.args  		     = {}
+		self.name  		     = urlparse.urlparse(url)[1]
 		self.exit_on_match = exit_on_match
 		
 		if self.type == 'POST':
@@ -41,7 +41,7 @@ class Service(threading.Thread):
 		
 		cleartext = self.__crack(self.hash)
 		if cleartext != None:
-			print "\t%s : %s" % (cleartext,self.name)
+			print "!!!\tThe plaintext of %s is '%s' (found on %s)" % ( self.hash, cleartext, self.name )
 			if self.exit_on_match == True:
 				os.kill( os.getpid(), signal.SIGTERM )
 			
@@ -86,7 +86,7 @@ class Service(threading.Thread):
 		return args
 
 try:
-	print "\n\tFang 1.1 - A multi service threaded MD5 cracker.\n \
+	print "\n\tFang 1.2 - A multi service threaded MD5 cracker.\n \
 \tCopyleft Simone Margaritelli <evilsocket@gmail.com>\n \
 \thttp://www.evilsocket.net\n\thttp://www.backbox.org\n";
                
@@ -94,41 +94,50 @@ try:
                                    "EXAMPLES:\n" +
                                    "  %prog --hash 7815696ecbf1c96e6894b779456d330e\n" +
                                    "  %prog --threads 10 --exit-first --hash 7815696ecbf1c96e6894b779456d330e\n" +
+                                   "  %prog --input hashlist.txt\n" +
                                    "  %prog --list" )
 
-	parser.add_option( "-H", "--hash",		 action="store", 	  dest="hash",		    default=None,  help="The hash to crack, mandatory." );
-	parser.add_option( "-t", "--threads", 	 action="store", 	  dest="threads",       default=10,    help="Specify how many threads to use, default 10." )
+	parser.add_option( "-H", "--hash",       action="store", 	    dest="hash",		      default=None,  help="The hash to crack, mandatory." )
+	parser.add_option( "-t", "--threads",    action="store", 	    dest="threads",       default=10,    help="Specify how many threads to use, default 10." )
 	parser.add_option( "-e", "--exit-first", action="store_true", dest="exit_on_first", default=False, help="Stop execution upon first positive match." )
-	parser.add_option( "-l", "--list",		 action="store_true", dest="list_services", default=False, help="Print a list of available services." );
+	parser.add_option( "-i", "--input",      action="store",      dest="input",         default=None,  help="Read a list of hashes from the given file." )
 	
 	(o,args) = parser.parse_args()
     
 	conf     = open( "fang.conf", "rt" ) 
 	services = []
+	hashes   = []
+	
+	if o.input != None:
+		o.exit_on_first = False
+		hashlist 				= open( o.input, "rt" ) 
+		for line in hashlist:
+			md5 = line.rstrip()
+			if md5 != '':
+				hashes.append(md5)		
+				
+	elif o.hash != None:
+		hashes.append( o.hash )
+		
+	else:
+		parser.error( "No hash specified!" )
 
 	for line in conf:
 		( type, url, regex ) = line.rstrip().split('|')
-		services.append( Service( type, url, regex, o.exit_on_first, o.hash ) )
+		for md5_hash in hashes:
+			services.append( Service( type, url, regex, o.exit_on_first, md5_hash ) )
 				
 	conf.close()
-	
-	if o.list_services == True:
-		for si, service in enumerate(services):	
-			print "\t[%d] %s" % (si,service.name)
-		exit(0)
-	elif o.hash == None:
-		parser.error( "No hash specified!" )
-
-	print "Searching for '%s' upon %d services... \n" % (o.hash,len(services))
 
 	i = 0
 	for si, service in enumerate(services):	
+		print "Searching for '%s' on %s ..." % ( service.hash, service.name )
 		service.start()
 		i += 1
 		if i >= o.threads or si >= len(services):
 			service.join()
 			i = 0
-			
+				
 except IOError as e:
 	print e
 except:
