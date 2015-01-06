@@ -86,7 +86,7 @@ class Service(threading.Thread):
 		return args
 
 try:
-	print "\n\tFang 1.2 - A multi service threaded MD5 cracker.\n \
+	print "\n\tFang 1.2 - A multi service threaded hash cracker.\n \
 \tCopyleft Simone Margaritelli <evilsocket@gmail.com>\n \
 \thttp://www.evilsocket.net\n\thttp://www.backbox.org\n";
                
