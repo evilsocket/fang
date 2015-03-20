@@ -101,13 +101,22 @@ try:
 	parser.add_option( "-t", "--threads",    action="store", 	    dest="threads",       default=10,    help="Specify how many threads to use, default 10." )
 	parser.add_option( "-e", "--exit-first", action="store_true", dest="exit_on_first", default=False, help="Stop execution upon first positive match." )
 	parser.add_option( "-i", "--input",      action="store",      dest="input",         default=None,  help="Read a list of hashes from the given file." )
-	
+	parser.add_option( "-p", "--proxy",	 action="store", 	dest ="proxy", default=None,help="Define a proxy (default: None)")
+
 	(o,args) = parser.parse_args()
     
 	conf     = open( "fang.conf", "rt" ) 
 	services = []
 	hashes   = []
-	
+	if o.proxy!= None:
+		# define proxy stuff
+		proxy = urllib2.ProxyHandler({'http': str(o.proxy)})
+		opener = urllib2.build_opener(proxy)
+		opener.addheaders = [('User-agent', 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/35.0')]
+		opener.addheaders = [('Content-Type', 'text/plain')]
+		urllib2.install_opener(opener)
+	else:
+		pass
 	if o.input != None:
 		o.exit_on_first = False
 		hashlist 				= open( o.input, "rt" ) 
