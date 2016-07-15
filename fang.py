@@ -67,10 +67,12 @@ class Service(threading.Thread):
 		return m.group(1) if m is not None else None
 		
 	def __exec_get( self, url ):
-		return urllib2.urlopen( urllib2.Request(url) ).read()
+		headers = {'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/35.0'}	
+		return urllib2.urlopen(urllib2.Request(url, None, headers)).read()
 		
 	def __exec_post( self, url, data ):
-		return urllib2.urlopen( urllib2.Request( url, urllib.urlencode(data) ) ).read()
+		headers = {'User-agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:33.0) Gecko/20100101 Firefox/35.0'}
+		return urllib2.urlopen(urllib2.Request(url, urllib.urlencode(data), headers)).read()
 			
 	def __parseArgs( self ):
 		m = re.search( "([^\[]+)\[([^\]]+)\]", self.url )
